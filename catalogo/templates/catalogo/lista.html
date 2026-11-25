@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Estante - Catálogo de Livros</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 16px; background: #f5f2ec; color: #222; }
+    h1 { background: #7a3e1d; color: white; padding: 16px; margin: 0 0 16px; }
+    form { background: white; border: 1px solid #ddd; padding: 12px; margin-bottom: 12px; }
+    input, select, button { padding: 6px; font-size: 1rem; }
+    .livro { background: white; border: 1px solid #ddd; padding: 10px 14px; margin-bottom: 8px; }
+    .livro h2 { margin: 0 0 4px; font-size: 1.1rem; }
+    .livro p { margin: 0; color: #666; }
+    .paginacao { text-align: center; margin: 20px 0; }
+    .paginacao a, .paginacao span { margin: 0 10px; }
+  </style>
+</head>
+<body>
+  <h1>Estante - Catálogo de Livros</h1>
+
+  <form method="get">
+    <input type="text" name="busca" value="{{ busca }}" placeholder="Pesquisar pelo título">
+
+    <select name="autor">
+      <option value="">Todos os autores</option>
+      {% for autor in autores %}
+        <option value="{{ autor.id }}" {% if autor.id|stringformat:"s" == autor_selecionado %}selected{% endif %}>{{ autor.nome }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="genero">
+      <option value="">Todos os gêneros</option>
+      {% for genero in generos %}
+        <option value="{{ genero.id }}" {% if genero.id|stringformat:"s" == genero_selecionado %}selected{% endif %}>{{ genero.nome }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">Filtrar</button>
+    <a href="/">Limpar</a>
+  </form>
+
+  <p>{{ page_obj.paginator.count }} livro(s) encontrado(s)</p>
+
+  {% for livro in page_obj %}
+    <div class="livro">
+      <h2>{{ livro.titulo }}</h2>
+      <p>{{ livro.autor.nome }} | {{ livro.genero.nome }} | {{ livro.ano }}</p>
+    </div>
+  {% empty %}
+    <p>Nenhum livro encontrado.</p>
+  {% endfor %}
+
+  <div class="paginacao">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.busca %}&amp;busca={{ request.GET.busca|urlencode }}{% endif %}{% if autor_selecionado %}&amp;autor={{ autor_selecionado|urlencode }}{% endif %}{% if genero_selecionado %}&amp;genero={{ genero_selecionado|urlencode }}{% endif %}">Anterior</a>
+    {% endif %}
+
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if request.GET.busca %}&amp;busca={{ request.GET.busca|urlencode }}{% endif %}{% if autor_selecionado %}&amp;autor={{ autor_selecionado|urlencode }}{% endif %}{% if genero_selecionado %}&amp;genero={{ genero_selecionado|urlencode }}{% endif %}">Próxima</a>
+    {% endif %}
+  </div>
+</body>
+</html>
